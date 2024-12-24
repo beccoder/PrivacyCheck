@@ -1,0 +1,36 @@
+name: privacy-check-server
+
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: postgres_container
+    ports:
+      - ${POSTGRES_PORT}:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d privacy-check" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - .db_data:/var/lib/postgresql/data
+
+  migrate:
+    image: migrate/migrate:latest
+    container_name: migration_service
+    command: [
+      "-path", "/migrations",
+      "-database", "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?sslmode=disable",
+      "up"
+    ]
+    volumes:
+      - ./database/migrations:/migrations
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  .db_data:
