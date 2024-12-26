@@ -1,0 +1,161 @@
+basePath: /api/v1
+definitions:
+  models.DataStatus:
+    enum:
+    - FOUND
+    - NOT_FOUND
+    type: string
+    x-enum-varnames:
+    - DataStatusFound
+    - DataStatusNotFound
+  models.LeakData:
+    properties:
+      data: {}
+      id:
+        type: integer
+      status:
+        $ref: '#/definitions/models.DataStatus'
+      user_id:
+        type: integer
+    required:
+    - id
+    - status
+    - user_id
+    type: object
+  models.LoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.RegisterDTO:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - first_name
+    - password
+    type: object
+  models.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Privacy Check Server Api in Go
+  title: Privacy Check Server API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user with email and password, returning a JWT token.
+      operationId: login
+      parameters:
+      - description: User credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT token for authentication
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: User Login
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with their details.
+      operationId: register
+      parameters:
+      - description: Registration details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: User Registration
+      tags:
+      - Auth
+  /search-my-leak-data:
+    get:
+      consumes:
+      - application/json
+      description: Search user leak data by email
+      operationId: search-user-leak-data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/models.LeakData'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Search user leak data
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

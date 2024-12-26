@@ -1,13 +1,13 @@
 package env
 
-import "sync"
+import (
+	"sync"
+)
 
 var envProject EnvProject
 
 type EnvProject struct {
-	Mode        string `env:"MODE"`
-	HttpPort    int    `env:"HTTP_PORT"`
-	StoragePath string `env:"STORAGE_PATH"`
+	HttpPort int `env:"HTTP_PORT"`
 
 	PgDB       string `env:"POSTGRES_DB"`
 	PgHost     string `env:"POSTGRES_HOST"`
@@ -15,9 +15,8 @@ type EnvProject struct {
 	PgUser     string `env:"POSTGRES_USER"`
 	PgPassword string `env:"POSTGRES_PASSWORD"`
 
-	JwtSecret  string `env:"JWT_SECRET"`
-	JwtExpire  int64  `env:"JWT_EXPIRE"`
-	JwtRefresh int64  `env:"JWT_REFRESH"`
+	JwtSecret string `env:"JWT_SECRET"`
+	JwtExpire int    `env:"JWT_EXPIRE"`
 }
 
 func init() {

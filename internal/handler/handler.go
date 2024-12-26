@@ -2,7 +2,8 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
-	"net/http"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "privacy-check/docs"
 	"privacy-check/internal/service"
 )
 
@@ -11,20 +12,12 @@ type handler struct {
 }
 
 func NewHandler(router *echo.Group, service service.Service) {
+	handler := &handler{service: service}
 
-	group := router.Group("/user")
+	router.GET("/swagger/*", echoSwagger.WrapHandler)
 	{
-		handler := &handler{service: service}
-
-		group.POST("", handler.Create)
-		//group.GET("/page", handler.Page)
-		//group.GET("/:id", handler.GetById)
-		//group.PATCH("/:id", handler.Update)
-		//group.DELETE("/:id", handler.Delete)
-
+		router.POST("/auth/register", handler.Register)
+		router.POST("/auth/login", handler.Login)
+		router.GET("/search-my-leak-data", handler.Search, handler.middleware)
 	}
-}
-
-func (h *handler) Create(c echo.Context) error {
-	return c.JSON(http.StatusNotImplemented, "not implemented")
 }

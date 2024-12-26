@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	loader "privacy-check/configs/env"
+	"privacy-check/configs/env"
 	"privacy-check/configs/pg"
 	"privacy-check/database"
 	"privacy-check/internal/handler"
@@ -16,8 +16,18 @@ import (
 	"privacy-check/internal/service"
 )
 
+// @title Privacy Check Server API
+// @version 1.0
+// @description Privacy Check Server Api in Go
+
+// @host localhost:8080
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
-	projectEnv := loader.ProjectEnv()
+	projectEnv := env.ProjectEnv()
 
 	pgConfig := pg.NewConfigEmpty()
 	{
@@ -38,7 +48,7 @@ func main() {
 	router := echo.New()
 	{
 		setMiddlewares(router)
-		createHandler(router, db)
+		createHandler(router, db, &projectEnv)
 		runHTTPServerOnAddr(router, projectEnv.HttpPort)
 	}
 }
@@ -57,9 +67,9 @@ func setMiddlewares(router *echo.Echo) {
 	router.Use(middleware.CORS())
 }
 
-func createHandler(router *echo.Echo, db *sqlx.DB) {
+func createHandler(router *echo.Echo, db *sqlx.DB, config *env.EnvProject) {
 	group := router.Group("/api/v1")
 	{
-		handler.NewHandler(group, service.NewService(repository.NewRepository(db)))
+		handler.NewHandler(group, service.NewService(repository.NewRepository(db), config))
 	}
 }
