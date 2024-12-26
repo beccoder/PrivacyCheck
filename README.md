@@ -18,7 +18,7 @@ Before running the project, ensure the following tools are installed:
     - Create a `.env` file based on the `example.env` file.
 3. Start the Docker environment:
    ```bash
-   make docker-start
+   make docker-up
    ```
     - This command will:
         - Initialize a PostgreSQL database.
